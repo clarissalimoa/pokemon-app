@@ -1,8 +1,20 @@
-import '../styles/globals.css'
-import type { AppProps } from 'next/app'
+import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import { ChakraProvider } from "@chakra-ui/react";
+import type { AppProps } from "next/app";
 
 function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+  const apolloClient = new ApolloClient({
+    uri: "https://graphql-pokeapi.vercel.app/api/graphql",
+    cache: new InMemoryCache(),
+  });
+
+  return (
+    <ApolloProvider client={apolloClient}>
+      <ChakraProvider>
+        <Component {...pageProps} />
+      </ChakraProvider>
+    </ApolloProvider>
+  );
 }
 
-export default MyApp
+export default MyApp;
