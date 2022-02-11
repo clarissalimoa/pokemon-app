@@ -11,7 +11,7 @@ export default function Navbar(props) {
           direction={"row"}
           spacing={6}
         >
-          <Link href="/pokemon" passHref>
+          <Link href="/" passHref>
             <Button
               as={"a"}
               fontSize={"sm"}

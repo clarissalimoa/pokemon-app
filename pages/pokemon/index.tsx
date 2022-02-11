@@ -27,7 +27,7 @@ export default function Pokemons() {
 
   const GetPokemons = () => {
     const { loading, error, data } = useQuery(GET_POKEMONS_LIST, {
-      variables: { limit: 24, offset: 1 },
+      variables: { limit: 100, offset: 1 },
     });
 
     if (loading) return "Loading...";
