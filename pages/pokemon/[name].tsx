@@ -7,25 +7,56 @@ import {
   Text,
   Image,
   Flex,
-  VStack,
   Button,
   Heading,
   SimpleGrid,
   StackDivider,
-  useColorModeValue,
-  List,
-  ListItem,
+  SkeletonCircle,
+  SkeletonText,
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  Tag,
+  ModalFooter,
+  FormControl,
+  FormLabel,
+  Input,
+  ModalOverlay,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  useDisclosure,
+  Center,
 } from "@chakra-ui/react";
 import { GET_POKEMON_DETAIL } from "../../api-config/pokemon";
 import Layout from "../../components/Layout";
+import Navbar from "../../components/Navbar";
+import React, { useEffect, useReducer, useRef, useState } from "react";
+import { pokemonReducer } from "../../utils/reducer";
 
-export default function Simple() {
+export default function DetailPokemon() {
   const router = useRouter();
   const { name } = router.query;
   var pokemon: any = {};
 
+  const [isOpen, setIsOpen] = useState(false);
+  const onClose = () => setIsOpen(false);
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  const {
+    isOpen: isOpenModal,
+    onOpen: onOpenModal,
+    onClose: onCloseModal,
+  } = useDisclosure();
+
+  const initialRef = useRef<HTMLInputElement>(null);
+  const finalRef = useRef<HTMLInputElement>(null);
+
   const GetPokemonDetail = () => {
-    console.log("masuk GetPokemonDetail");
     const { loading, error, data } = useQuery(GET_POKEMON_DETAIL, {
       variables: { name: name },
     });
@@ -34,176 +65,211 @@ export default function Simple() {
     if (error) return `Error! ${error.message}`;
 
     console.log("Response from server", data);
-    pokemon = data;
+    pokemon = data["pokemon"];
     return "Success!";
   };
   console.log(GetPokemonDetail());
 
+  const [myPokemons, dispatch] = useReducer(pokemonReducer, [], () => {
+    const localData = localStorage.getItem("myPokemons");
+    return localData ? JSON.parse(localData) : [];
+  });
+  useEffect(() => {
+    localStorage.setItem("myPokemons", JSON.stringify(myPokemons));
+  }, [myPokemons]);
+
+  const [nickname, setNickname] = useState("Eci");
+  const [errorNickname, setErrorNickname] = useState(false);
+
+  const openModal = () => {
+    setIsOpen(false);
+    onOpenModal();
+  };
+
+  const handleChangeNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNickname(e.target.value);
+  };
+
+  const onCatchPokemon = () => {
+    const name = pokemon["name"];
+    const image = pokemon["sprites"]["front_default"];
+    if (myPokemons.filter((x: any) => x.nickname === nickname).length > 0) {
+      console.log(myPokemons.filter((x: any) => x.nickname === nickname));
+      setErrorNickname(true);
+    } else {
+      dispatch({
+        type: "CATCH_POKEMON",
+        name: name,
+        nickname: nickname,
+        image: image,
+      });
+      onCloseModal();
+    }
+  };
+
   return (
     <Layout title={name}>
+      <Navbar></Navbar>
       <Container maxW={"7xl"}>
-        <SimpleGrid
-          columns={{ base: 1, lg: 2 }}
-          spacing={{ base: 8, md: 10 }}
-          py={{ base: 18, md: 24 }}
-        >
-          <Flex>
-            <Image
-              rounded={"md"}
-              alt={"product image"}
-              src={
-                "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/25.png"
-              }
-              fit={"cover"}
-              align={"center"}
-              w={"100%"}
-              h={{ base: "100%", sm: "400px", lg: "500px" }}
-            />
-          </Flex>
-          <Stack spacing={{ base: 6, md: 10 }}>
-            <Box as={"header"}>
-              <Heading
-                lineHeight={1.1}
-                fontWeight={600}
-                fontSize={{ base: "2xl", sm: "4xl", lg: "5xl" }}
-              >
-                {name}
-              </Heading>
-              <Text
-                color={useColorModeValue("gray.900", "gray.400")}
-                fontWeight={300}
-                fontSize={"2xl"}
-              >
-                $350.00 USD
-              </Text>
-            </Box>
-
-            <Stack
-              spacing={{ base: 4, sm: 6 }}
-              direction={"column"}
-              divider={
-                <StackDivider
-                  borderColor={useColorModeValue("gray.200", "gray.600")}
-                />
-              }
-            >
-              <VStack spacing={{ base: 4, sm: 6 }}>
-                <Text
-                  color={useColorModeValue("gray.500", "gray.400")}
-                  fontSize={"2xl"}
-                  fontWeight={"300"}
+        {!pokemon["abilities"] ? (
+          <>
+            <SkeletonCircle size="250" width={"100%"} />
+            <SkeletonText mt="4" noOfLines={4} spacing="4" />
+          </>
+        ) : (
+          <SimpleGrid
+            columns={{ base: 1, lg: 2 }}
+            spacing={{ base: 8, md: 10 }}
+            py={{ base: 18, md: 24 }}
+          >
+            <Flex>
+              <Image
+                rounded={"md"}
+                alt={"product image"}
+                src={pokemon["sprites"]["front_default"]}
+                fit={"cover"}
+                align={"center"}
+                w={"100%"}
+                h={{ base: "100%", sm: "400px", lg: "500px" }}
+              />
+            </Flex>
+            <Stack spacing={{ base: 6, md: 10 }}>
+              <Box as={"header"}>
+                <Heading
+                  lineHeight={1.1}
+                  fontWeight={600}
+                  fontSize={{ base: "2xl", sm: "4xl", lg: "5xl" }}
                 >
-                  Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
-                  diam nonumy eirmod tempor invidunt ut labore
-                </Text>
-                <Text fontSize={"lg"}>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad
-                  aliquid amet at delectus doloribus dolorum expedita hic, ipsum
-                  maxime modi nam officiis porro, quae, quisquam quos
-                  reprehenderit velit? Natus, totam.
-                </Text>
-              </VStack>
-              <Box>
-                <Text
-                  fontSize={{ base: "16px", lg: "18px" }}
-                  color={useColorModeValue("yellow.500", "yellow.300")}
-                  fontWeight={"500"}
-                  textTransform={"uppercase"}
-                  mb={"4"}
-                >
-                  Features
-                </Text>
-
-                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
-                  <List spacing={2}>
-                    <ListItem>Chronograph</ListItem>
-                    <ListItem>Master Chronometer Certified</ListItem>{" "}
-                    <ListItem>Tachymeter</ListItem>
-                  </List>
-                  <List spacing={2}>
-                    <ListItem>Anti‑magnetic</ListItem>
-                    <ListItem>Chronometer</ListItem>
-                    <ListItem>Small seconds</ListItem>
-                  </List>
-                </SimpleGrid>
+                  {pokemon["name"].toUpperCase()}
+                </Heading>
               </Box>
-              <Box>
-                <Text
-                  fontSize={{ base: "16px", lg: "18px" }}
-                  color={useColorModeValue("yellow.500", "yellow.300")}
-                  fontWeight={"500"}
-                  textTransform={"uppercase"}
-                  mb={"4"}
-                >
-                  Product Details
-                </Text>
 
-                <List spacing={2}>
-                  <ListItem>
-                    <Text as={"span"} fontWeight={"bold"}>
-                      Between lugs:
-                    </Text>{" "}
-                    20 mm
-                  </ListItem>
-                  <ListItem>
-                    <Text as={"span"} fontWeight={"bold"}>
-                      Bracelet:
-                    </Text>{" "}
-                    leather strap
-                  </ListItem>
-                  <ListItem>
-                    <Text as={"span"} fontWeight={"bold"}>
-                      Case:
-                    </Text>{" "}
-                    Steel
-                  </ListItem>
-                  <ListItem>
-                    <Text as={"span"} fontWeight={"bold"}>
-                      Case diameter:
-                    </Text>{" "}
-                    42 mm
-                  </ListItem>
-                  <ListItem>
-                    <Text as={"span"} fontWeight={"bold"}>
-                      Dial color:
-                    </Text>{" "}
-                    Black
-                  </ListItem>
-                  <ListItem>
-                    <Text as={"span"} fontWeight={"bold"}>
-                      Crystal:
-                    </Text>{" "}
-                    Domed, scratch‑resistant sapphire crystal with
-                    anti‑reflective treatment inside
-                  </ListItem>
-                  <ListItem>
-                    <Text as={"span"} fontWeight={"bold"}>
-                      Water resistance:
-                    </Text>{" "}
-                    5 bar (50 metres / 167 feet){" "}
-                  </ListItem>
-                </List>
-              </Box>
+              <Stack
+                spacing={{ base: 4, sm: 6 }}
+                direction={"column"}
+                divider={<StackDivider borderColor={"gray.600"} />}
+              >
+                <Box>
+                  <Text
+                    fontSize={{ base: "16px", lg: "18px" }}
+                    color={"yellow.300"}
+                    fontWeight={"500"}
+                    textTransform={"uppercase"}
+                    mb={"4"}
+                  >
+                    Abilities
+                  </Text>
+                  {pokemon["abilities"].map((item: any) => {
+                    return (
+                      <>
+                        <Tag margin={"2px"}>{item["ability"]["name"]}</Tag>
+                      </>
+                    );
+                  })}
+                </Box>
+                <Box>
+                  <Text
+                    fontSize={{ base: "16px", lg: "18px" }}
+                    color={"yellow.300"}
+                    fontWeight={"500"}
+                    textTransform={"uppercase"}
+                    mb={"4"}
+                  >
+                    Moves
+                  </Text>
+
+                  {pokemon["moves"].map((item: any) => {
+                    return (
+                      <>
+                        <Tag margin={"2px"}>{item["move"]["name"]}</Tag>
+                      </>
+                    );
+                  })}
+                </Box>
+              </Stack>
+
+              <Button colorScheme="red" onClick={() => setIsOpen(true)}>
+                Catch Pokemon
+              </Button>
+
+              <AlertDialog
+                isOpen={isOpen}
+                onClose={onClose}
+                leastDestructiveRef={cancelRef}
+              >
+                <AlertDialogOverlay>
+                  <AlertDialogContent>
+                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                      Catch Pokemon
+                    </AlertDialogHeader>
+
+                    <AlertDialogBody>Are you sure?</AlertDialogBody>
+
+                    <AlertDialogFooter>
+                      <Button onClick={onClose}>Cancel</Button>
+                      {/* <Button colorScheme="red" onClick={onCatchPokemon} ml={3}> */}
+                      <Button colorScheme="red" onClick={openModal} ml={3}>
+                        Catch
+                      </Button>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialogOverlay>
+              </AlertDialog>
+
+              <Modal
+                initialFocusRef={initialRef}
+                finalFocusRef={finalRef}
+                isOpen={isOpenModal}
+                onClose={onCloseModal}
+              >
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>Pokemon caught!</ModalHeader>
+                  <ModalBody pb={6}>
+                    <Stack align={"center"}>
+                      <Image
+                        rounded={"md"}
+                        alt={"product image"}
+                        src={pokemon["sprites"]["front_default"]}
+                        align={"center"}
+                        w={"50%"}
+                      />
+                    </Stack>
+                    <Text>
+                      Congratulation! You got new pokemon. Please name your new
+                      pokemon.
+                    </Text>
+                    <FormControl>
+                      <FormLabel>Nickname</FormLabel>
+                      <Input
+                        ref={initialRef}
+                        placeholder="Nickname"
+                        onChange={handleChangeNickname}
+                      />
+                    </FormControl>
+                    {errorNickname && (
+                      <Text
+                        fontSize={{ base: "10px", lg: "12px" }}
+                        color={"red.300"}
+                        mb={"4"}
+                      >
+                        Pokemon with this nickname has existed! Pick another
+                        name
+                      </Text>
+                    )}
+                  </ModalBody>
+
+                  <ModalFooter>
+                    <Button colorScheme="blue" onClick={onCatchPokemon} mr={3}>
+                      Catch
+                    </Button>
+                    <Button onClick={onCloseModal}>Release</Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
             </Stack>
-
-            <Button
-              rounded={"none"}
-              w={"full"}
-              mt={8}
-              size={"lg"}
-              py={"7"}
-              bg={useColorModeValue("gray.900", "gray.50")}
-              color={useColorModeValue("white", "gray.900")}
-              textTransform={"uppercase"}
-              _hover={{
-                transform: "translateY(2px)",
-                boxShadow: "lg",
-              }}
-            >
-              Catch Pokemon
-            </Button>
-          </Stack>
-        </SimpleGrid>
+          </SimpleGrid>
+        )}
       </Container>
     </Layout>
   );

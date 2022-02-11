@@ -33,7 +33,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 ## Credits:
 
-Next.js: https://nextjs.org/
-UI/UX Design: https://chakra-templates.dev
-GraphQL PokeAPI: https://github.com/mazipan/graphql-pokeapi
-Parsinta (Youtube) - Next.js Tutorial in Indonesia: https://www.youtube.com/channel/UCPlEbdgWOXkKEEl7dhBxs4Q
+- Next.js: https://nextjs.org/
+- UI/UX Design: https://chakra-templates.dev
+- GraphQL PokeAPI: https://github.com/mazipan/graphql-pokeapi
+- Parsinta (Youtube) - Next.js Tutorial in Indonesia: https://www.youtube.com/channel/UCPlEbdgWOXkKEEl7dhBxs4Q

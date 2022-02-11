@@ -21,3 +21,8 @@ export interface IPokemonDetail {
   name: string;
   image: string;
 }
+
+export interface IMyPokemon {
+  name: string;
+  nickname: string;
+}
