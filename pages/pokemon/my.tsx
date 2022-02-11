@@ -1,4 +1,10 @@
-import React, { useEffect, useReducer, useRef, useState } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import Layout from "../../components/Layout";
 import Navbar from "../../components/Navbar";
 import { pokemonReducer } from "../../utils/reducer";
@@ -24,23 +30,30 @@ import { css } from "@emotion/css";
 import Link from "next/link";
 
 export default function MyPokemons() {
-  const [myPokemons, dispatch] = useReducer(pokemonReducer, [], () => {
-    const localData = localStorage.getItem("myPokemons");
-    return localData ? JSON.parse(localData) : [];
-  });
+  const [myPokemons, setMyPokemons] = useState<any>([]);
+
+  useEffect(() => {
+    setMyPokemons(JSON.parse(localStorage.getItem("myPokemons") + ""));
+  }, []);
+
+  // const [myPokemons, dispatch] = useReducer(pokemonReducer, [], () => {
+  //   const localData = localStorage.getItem("myPokemons");
+  //   return localData ? JSON.parse(localData) : [];
+  // });
+
+  useEffect(() => {
+    localStorage.setItem("myPokemons", JSON.stringify(myPokemons));
+  }, [myPokemons]);
 
   const [isOpen, setIsOpen] = useState(false);
   const [nickname, setNickname] = useState("");
   const onClose = () => setIsOpen(false);
   const cancelRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    localStorage.setItem("myPokemons", JSON.stringify(myPokemons));
-  }, [myPokemons]);
-
   const onReleasePokemon = () => {
     console.log("Release Pokemon");
-    dispatch({ type: "RELEASE_POKEMON", nickname: nickname });
+    // dispatch({ type: "RELEASE_POKEMON", nickname: nickname });
+    setMyPokemons(myPokemons.filter((x: any) => x.nickname !== nickname));
     onClose();
     toast({
       description: "Pokemon released",

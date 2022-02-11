@@ -14,19 +14,16 @@ import Layout from "../../components/Layout";
 import Navbar from "../../components/Navbar";
 import { css } from "@emotion/css";
 import Link from "next/link";
-import { useEffect, useReducer } from "react";
-import { pokemonReducer } from "../../utils/reducer";
+import { useEffect, useState } from "react";
 
 export default function Pokemons() {
   var pokemons = ["pokemon"];
 
-  const [myPokemons] = useReducer(pokemonReducer, [], () => {
-    const localData = localStorage.getItem("myPokemons");
-    return localData ? JSON.parse(localData) : [];
-  });
+  const [myPokemons, setMyPokemons] = useState<any>([]);
+
   useEffect(() => {
-    localStorage.setItem("myPokemons", JSON.stringify(myPokemons));
-  }, [myPokemons]);
+    setMyPokemons(JSON.parse(localStorage.getItem("myPokemons") + ""));
+  }, []);
 
   const GetPokemons = () => {
     const { loading, error, data } = useQuery(GET_POKEMONS_LIST, {

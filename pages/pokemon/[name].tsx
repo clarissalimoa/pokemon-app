@@ -83,17 +83,23 @@ export default function DetailPokemon() {
   };
   console.log(GetPokemonDetail());
 
-  const [myPokemons, dispatch] = useReducer(pokemonReducer, [], () => {
-    const localData = localStorage.getItem("myPokemons");
-    return localData ? JSON.parse(localData) : [];
-  });
+  const [myPokemons, setMyPokemons] = useState<any>([]);
+
+  useEffect(() => {
+    setMyPokemons(JSON.parse(localStorage.getItem("myPokemons") + ""));
+  }, []);
+
+  // const [myPokemons, dispatch] = useReducer(pokemonReducer, [], () => {
+  //   const localData = localStorage.getItem("myPokemons");
+  //   return localData ? JSON.parse(localData) : [];
+  // });
+
   useEffect(() => {
     localStorage.setItem("myPokemons", JSON.stringify(myPokemons));
   }, [myPokemons]);
 
   const [nickname, setNickname] = useState("Eci");
   const [errorNickname, setErrorNickname] = useState(false);
-  const [isValidNickname, setIsValidNickname] = useState(false);
   const toast = useToast();
   const isEmptyNickname = nickname === "";
 
@@ -122,9 +128,7 @@ export default function DetailPokemon() {
   const onCatchPokemon = () => {
     const name = pokemon["name"];
     const image = pokemon["sprites"]["front_default"];
-    if (nickname === "") {
-      setIsValidNickname(false);
-    } else {
+    if (!isEmptyNickname) {
       if (
         myPokemons.filter(
           (x: any) => x.nickname.toLowerCase() === nickname.toLowerCase()
@@ -132,15 +136,19 @@ export default function DetailPokemon() {
       ) {
         setErrorNickname(true);
       } else {
-        dispatch({
-          type: "CATCH_POKEMON",
-          name: name,
-          nickname: nickname,
-          image: image,
-        });
+        // dispatch({
+        //   type: "CATCH_POKEMON",
+        //   name: name,
+        //   nickname: nickname,
+        //   image: image,
+        // });
+        setMyPokemons([
+          ...myPokemons,
+          { name: name, nickname: nickname, image: image },
+        ]);
         onCloseModal();
         toast({
-          description: "Pokemon released",
+          description: "You've caught a pokemon!",
           status: "success",
           duration: 2000,
         });
