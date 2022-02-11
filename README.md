@@ -1,6 +1,11 @@
-Pokemon App
+## Pokemon App
 
-This is ReactJS app with Next.js framework. The features of this app including Pokemons list, Pokemon's detail, catch a Pokemon, and user's catched Pokemons list.
+This is a ReactJS app with Next.js framework. The features of this app including Pokemons list, Pokemon's detail, catch a Pokemon, and user's catched Pokemons list.
+Tech used in this app:
+
+- Next.JS (ReactJS, Typescript)
+- Chakra UI
+- Apollo client for GraphQL
 
 ## Running the App Locally
 
