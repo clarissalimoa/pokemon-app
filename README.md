@@ -16,7 +16,7 @@ yarn dev
 
 ## Deployed App on Vercel
 
-[Deployed App](https://pokemon-app-next.vercel.app/)
+[Deployed App](https://pokemon-app-next.vercel.app/pokemon/pikachu)
 [https://pokemon-app-next.vercel.app/](https://pokemon-app-next.vercel.app/)
 
 ## Credits:
