@@ -30,7 +30,8 @@ import {
   ModalHeader,
   ModalBody,
   useDisclosure,
-  Center,
+  Avatar,
+  useToast,
 } from "@chakra-ui/react";
 import { GET_POKEMON_DETAIL } from "../../api-config/pokemon";
 import Layout from "../../components/Layout";
@@ -51,6 +52,18 @@ export default function DetailPokemon() {
     isOpen: isOpenModal,
     onOpen: onOpenModal,
     onClose: onCloseModal,
+  } = useDisclosure();
+
+  const {
+    isOpen: isOpenCatching,
+    onOpen: onOpenCatching,
+    onClose: onCloseCatching,
+  } = useDisclosure();
+
+  const {
+    isOpen: isOpenFailed,
+    onOpen: onOpenFailed,
+    onClose: onCloseFailed,
   } = useDisclosure();
 
   const initialRef = useRef<HTMLInputElement>(null);
@@ -80,30 +93,58 @@ export default function DetailPokemon() {
 
   const [nickname, setNickname] = useState("Eci");
   const [errorNickname, setErrorNickname] = useState(false);
-
-  const openModal = () => {
-    setIsOpen(false);
-    onOpenModal();
-  };
+  const [isValidNickname, setIsValidNickname] = useState(false);
+  const toast = useToast();
+  const isEmptyNickname = nickname === "";
 
   const handleChangeNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(e.target.value);
+    setErrorNickname(false);
+  };
+
+  const tryToCatch = () => {
+    setIsOpen(false);
+    onCloseFailed();
+    onOpenCatching();
+
+    setTimeout(() => {
+      onCloseCatching();
+      var random = Math.floor(Math.random() * 2);
+      console.log("Random:" + random);
+      if (random == 0) {
+        onOpenModal();
+      } else {
+        onOpenFailed();
+      }
+    }, 2000);
   };
 
   const onCatchPokemon = () => {
     const name = pokemon["name"];
     const image = pokemon["sprites"]["front_default"];
-    if (myPokemons.filter((x: any) => x.nickname === nickname).length > 0) {
-      console.log(myPokemons.filter((x: any) => x.nickname === nickname));
-      setErrorNickname(true);
+    if (nickname === "") {
+      setIsValidNickname(false);
     } else {
-      dispatch({
-        type: "CATCH_POKEMON",
-        name: name,
-        nickname: nickname,
-        image: image,
-      });
-      onCloseModal();
+      if (
+        myPokemons.filter(
+          (x: any) => x.nickname.toLowerCase() === nickname.toLowerCase()
+        ).length > 0
+      ) {
+        setErrorNickname(true);
+      } else {
+        dispatch({
+          type: "CATCH_POKEMON",
+          name: name,
+          nickname: nickname,
+          image: image,
+        });
+        onCloseModal();
+        toast({
+          description: "Pokemon released",
+          status: "success",
+          duration: 2000,
+        });
+      }
     }
   };
 
@@ -125,7 +166,7 @@ export default function DetailPokemon() {
             <Flex>
               <Image
                 rounded={"md"}
-                alt={"product image"}
+                alt={"pokemon image"}
                 src={pokemon["sprites"]["front_default"]}
                 fit={"cover"}
                 align={"center"}
@@ -143,7 +184,24 @@ export default function DetailPokemon() {
                   {pokemon["name"].toUpperCase()}
                 </Heading>
               </Box>
-
+              <Stack align={"center"}>
+                <Text
+                  textTransform="uppercase"
+                  bg={"red.700"}
+                  px={3}
+                  py={1}
+                  color={"white"}
+                  fontSize="sm"
+                  fontWeight="600"
+                  rounded="xl"
+                >
+                  Owned:{" "}
+                  {
+                    myPokemons.filter((x: any) => x.name === pokemon["name"])
+                      .length
+                  }
+                </Text>
+              </Stack>
               <Stack
                 spacing={{ base: 4, sm: 6 }}
                 direction={"column"}
@@ -152,7 +210,7 @@ export default function DetailPokemon() {
                 <Box>
                   <Text
                     fontSize={{ base: "16px", lg: "18px" }}
-                    color={"yellow.300"}
+                    color={"yellow.500"}
                     fontWeight={"500"}
                     textTransform={"uppercase"}
                     mb={"4"}
@@ -170,7 +228,7 @@ export default function DetailPokemon() {
                 <Box>
                   <Text
                     fontSize={{ base: "16px", lg: "18px" }}
-                    color={"yellow.300"}
+                    color={"yellow.500"}
                     fontWeight={"500"}
                     textTransform={"uppercase"}
                     mb={"4"}
@@ -189,6 +247,7 @@ export default function DetailPokemon() {
               </Stack>
 
               <Button colorScheme="red" onClick={() => setIsOpen(true)}>
+                <Avatar src="https://www.freeiconspng.com/thumbs/pokeball-png/file-pokeball-png-0.png" />
                 Catch Pokemon
               </Button>
 
@@ -208,7 +267,7 @@ export default function DetailPokemon() {
                     <AlertDialogFooter>
                       <Button onClick={onClose}>Cancel</Button>
                       {/* <Button colorScheme="red" onClick={onCatchPokemon} ml={3}> */}
-                      <Button colorScheme="red" onClick={openModal} ml={3}>
+                      <Button colorScheme="red" onClick={tryToCatch} ml={3}>
                         Catch
                       </Button>
                     </AlertDialogFooter>
@@ -216,6 +275,45 @@ export default function DetailPokemon() {
                 </AlertDialogOverlay>
               </AlertDialog>
 
+              {/* Load Catching */}
+              <Modal isOpen={isOpenCatching} onClose={onCloseCatching}>
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>Catching Pokemon...</ModalHeader>
+                  <ModalBody>
+                    <Image
+                      alt={"Pokeball"}
+                      src="https://thumbs.gfycat.com/DampSpanishCleanerwrasse-max-1mb.gif"
+                    ></Image>
+                  </ModalBody>
+
+                  <ModalFooter>
+                    <Button colorScheme="blue" mr={3} onClick={onCloseCatching}>
+                      Cancel
+                    </Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
+
+              {/* Failed Catch */}
+              <Modal isOpen={isOpenFailed} onClose={onCloseFailed}>
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>Pokemon gone</ModalHeader>
+                  <ModalBody>The pokemon is gone :(</ModalBody>
+
+                  <ModalFooter>
+                    <Button colorScheme="blue" mr={3} onClick={onCloseFailed}>
+                      Cancel
+                    </Button>
+                    <Button mr={3} onClick={tryToCatch}>
+                      Catch Again
+                    </Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
+
+              {/* Success Catch */}
               <Modal
                 initialFocusRef={initialRef}
                 finalFocusRef={finalRef}
@@ -242,9 +340,11 @@ export default function DetailPokemon() {
                     <FormControl>
                       <FormLabel>Nickname</FormLabel>
                       <Input
+                        isInvalid={errorNickname || isEmptyNickname}
                         ref={initialRef}
                         placeholder="Nickname"
                         onChange={handleChangeNickname}
+                        required
                       />
                     </FormControl>
                     {errorNickname && (
@@ -255,6 +355,16 @@ export default function DetailPokemon() {
                       >
                         Pokemon with this nickname has existed! Pick another
                         name
+                      </Text>
+                    )}
+
+                    {isEmptyNickname && (
+                      <Text
+                        fontSize={{ base: "10px", lg: "12px" }}
+                        color={"red.300"}
+                        mb={"4"}
+                      >
+                        Nickname is required
                       </Text>
                     )}
                   </ModalBody>

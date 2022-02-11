@@ -1,5 +1,4 @@
 import React, { useEffect, useReducer, useRef, useState } from "react";
-import { NextPage } from "next";
 import Layout from "../../components/Layout";
 import Navbar from "../../components/Navbar";
 import { pokemonReducer } from "../../utils/reducer";
@@ -10,9 +9,7 @@ import {
   Image,
   Flex,
   Heading,
-  useColorModeValue,
   SimpleGrid,
-  Skeleton,
   Button,
   AlertDialog,
   AlertDialogOverlay,
@@ -20,6 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogBody,
   AlertDialogFooter,
+  useToast,
 } from "@chakra-ui/react";
 import { css } from "@emotion/css";
 
@@ -44,6 +42,11 @@ export default function MyPokemons() {
     console.log("Release Pokemon");
     dispatch({ type: "RELEASE_POKEMON", nickname: nickname });
     onClose();
+    toast({
+      description: "Pokemon released",
+      status: "success",
+      duration: 2000,
+    });
   };
 
   const openModal = (nick: string) => {
@@ -51,43 +54,43 @@ export default function MyPokemons() {
     setNickname(nick);
   };
 
+  const toast = useToast();
+
   return (
     <>
       <Layout title="My Pokemons">
         <Navbar></Navbar>
         {myPokemons.length < 1 ? (
-          <>
-            <Heading
-              lineHeight={1.1}
-              fontWeight={600}
-              fontSize={{ base: "3xl", sm: "4xl", lg: "6xl" }}
+          <Heading
+            lineHeight={1.1}
+            fontWeight={600}
+            fontSize={{ base: "3xl", sm: "4xl", lg: "6xl" }}
+          >
+            <Text as={"span"} color={"red.400"}>
+              You have no
+            </Text>
+            <br />
+            <Text
+              as={"span"}
+              position={"relative"}
+              _after={{
+                content: "''",
+                width: "full",
+                height: "30%",
+                position: "absolute",
+                bottom: 1,
+                left: 0,
+                bg: "red.400",
+                zIndex: -1,
+              }}
             >
-              <Text as={"span"} color={"red.400"}>
-                You have no
-              </Text>
-              <br />
-              <Text
-                as={"span"}
-                position={"relative"}
-                _after={{
-                  content: "''",
-                  width: "full",
-                  height: "30%",
-                  position: "absolute",
-                  bottom: 1,
-                  left: 0,
-                  bg: "red.400",
-                  zIndex: -1,
-                }}
-              >
-                Pokemon
-              </Text>
-              <br />
-              <Text as={"span"} color={"red.400"}>
-                Go catch em all!
-              </Text>
-            </Heading>
-          </>
+              Pokemon
+            </Text>
+            <br />
+            <Text as={"span"} color={"red.400"}>
+              Go catch em all!
+            </Text>
+          </Heading>
         ) : (
           <SimpleGrid columns={{ base: 2, md: 3, lg: 6 }}>
             {myPokemons.map((item: any, index: number) => {
@@ -100,7 +103,7 @@ export default function MyPokemons() {
                   >
                     <Box
                       role={"group"}
-                      p={6}
+                      p={2}
                       maxW={"330px"}
                       w={"full"}
                       boxShadow={"2xl"}
@@ -109,43 +112,40 @@ export default function MyPokemons() {
                       zIndex={1}
                     >
                       <Link href={"/pokemon/" + item["name"]} passHref>
-                        <>
-                          <Flex>
-                            <Image
-                              rounded={"md"}
-                              alt={"product image"}
-                              src={item["image"]}
-                              align={"center"}
-                              h={"130px"}
-                            />
-                          </Flex>
-                          <Stack pt={10} align={"center"}>
-                            <Text
-                              color={"gray.500"}
-                              fontSize={"sm"}
-                              textTransform={"uppercase"}
-                            >
-                              {item["name"].charAt(0).toUpperCase() +
-                                item["name"].slice(1)}
-                            </Text>
-                            <Heading
-                              fontSize={20}
-                              fontFamily={"body"}
-                              fontWeight={500}
-                            >
-                              {item["nickname"]}
-                            </Heading>
-                          </Stack>
-                        </>
+                        <Stack pt={10} align={"center"}>
+                          <Image
+                            rounded={"md"}
+                            alt={"product image"}
+                            src={item["image"]}
+                            align={"center"}
+                            h={"130px"}
+                          />
+                          <Text
+                            color={"gray.500"}
+                            fontSize={"sm"}
+                            textTransform={"uppercase"}
+                          >
+                            {item["name"].charAt(0).toUpperCase() +
+                              item["name"].slice(1)}
+                          </Text>
+                          <Heading
+                            fontSize={20}
+                            fontFamily={"body"}
+                            fontWeight={500}
+                          >
+                            {item["nickname"]}
+                          </Heading>
+                        </Stack>
                       </Link>
-
-                      <Button
-                        colorScheme="red"
-                        onClick={() => openModal(item["nickname"])}
-                        ml={3}
-                      >
-                        Release
-                      </Button>
+                      <Stack pt={10} align={"center"}>
+                        <Button
+                          colorScheme="red"
+                          onClick={() => openModal(item["nickname"])}
+                          ml={3}
+                        >
+                          Release
+                        </Button>
+                      </Stack>
                     </Box>
                   </Flex>
                 </>

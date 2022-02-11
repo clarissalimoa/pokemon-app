@@ -14,9 +14,19 @@ import Layout from "../../components/Layout";
 import Navbar from "../../components/Navbar";
 import { css } from "@emotion/css";
 import Link from "next/link";
+import { useEffect, useReducer } from "react";
+import { pokemonReducer } from "../../utils/reducer";
 
 export default function Pokemons() {
   var pokemons = ["pokemon"];
+
+  const [myPokemons] = useReducer(pokemonReducer, [], () => {
+    const localData = localStorage.getItem("myPokemons");
+    return localData ? JSON.parse(localData) : [];
+  });
+  useEffect(() => {
+    localStorage.setItem("myPokemons", JSON.stringify(myPokemons));
+  }, [myPokemons]);
 
   const GetPokemons = () => {
     const { loading, error, data } = useQuery(GET_POKEMONS_LIST, {
@@ -125,12 +135,17 @@ export default function Pokemons() {
                               bg={"red.700"}
                               px={3}
                               py={1}
-                              color={"gray.300"}
+                              color={"white"}
                               fontSize="sm"
                               fontWeight="600"
                               rounded="xl"
                             >
-                              Owned:
+                              Owned:{" "}
+                              {
+                                myPokemons.filter(
+                                  (x: any) => x.name === item["name"]
+                                ).length
+                              }
                             </Text>
                           </Stack>
                         </Box>

@@ -36,4 +36,6 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 - Next.js: https://nextjs.org/
 - UI/UX Design: https://chakra-templates.dev
 - GraphQL PokeAPI: https://github.com/mazipan/graphql-pokeapi
-- Parsinta (Youtube) - Next.js Tutorial in Indonesia: https://www.youtube.com/channel/UCPlEbdgWOXkKEEl7dhBxs4Q
+- Parsinta (Youtube) - Next.js Tutorial: https://www.youtube.com/channel/UCPlEbdgWOXkKEEl7dhBxs4Q
+- The Net Ninja (Youtube) - React Context & Hooks Tutorial: https://www.youtube.com/playlist?list=PL4cUxeGkcC9hNokByJilPg5g9m2APUePI
+- Pokeball Gif: https://gfycat.com/stickers/search/pokeball
