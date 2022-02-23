@@ -73,7 +73,7 @@ export default function MyPokemons() {
     <>
       <Layout title="My Pokemons">
         <Navbar></Navbar>
-        {myPokemons.length < 1 ? (
+        {myPokemons == null || myPokemons.length < 1 ? (
           <Heading
             lineHeight={1.1}
             fontWeight={600}
