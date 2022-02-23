@@ -138,10 +138,11 @@ export default function Pokemons() {
                               rounded="xl"
                             >
                               Owned:{" "}
-                              {myPokemons != null &&
-                                myPokemons.filter(
-                                  (x: any) => x.name === item["name"]
-                                ).length}
+                              {myPokemons != null
+                                ? myPokemons.filter(
+                                    (x: any) => x.name === item["name"]
+                                  ).length
+                                : 0}
                             </Text>
                           </Stack>
                         </Box>

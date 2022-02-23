@@ -204,10 +204,10 @@ export default function DetailPokemon() {
                   rounded="xl"
                 >
                   Owned:{" "}
-                  {
-                    myPokemons.filter((x: any) => x.name === pokemon["name"])
-                      .length
-                  }
+                  {myPokemons != null
+                    ? myPokemons.filter((x: any) => x.name === pokemon["name"])
+                        .length
+                    : 0}
                 </Text>
               </Stack>
               <Stack
